@@ -104,8 +104,12 @@ If you are an SDR enthusiast looking to get started with the LiteX-M2SDR board, 
 2. **Install Required Software:**
    - Ensure you have the necessary software installed on your Linux system. You can do this by running the following command in your terminal:
    ```
-   sudo apt install gnuradio gnuradio-dev soapysdr-tools libsoapysdr0.8 libsoapysdr-dev libgnuradio-soapy3.10.1 gqrx
+   sudo apt install git cmake gnuradio gnuradio-dev soapysdr-tools libsoapysdr0.8 libsoapysdr-dev libgnuradio-soapy3.10.9t64 gqrx-sdr
    ```
+
+> [!WARNING]
+>
+> If an error related to DKMS appears during installation, run sudo apt remove --purge xtrx-dkms dkms and then re-execute the installation command.
 
 3. **Clone the Repository:**
    - Clone the LiteX-M2SDR repository using the following command:
@@ -149,6 +153,11 @@ If you are an SDR enthusiast looking to get started with the LiteX-M2SDR board, 
 > APPEND ... iommu.passthrough=1 arm-smmu.disable=1
 > sudo reboot
 > ```
+
+> [!WARNING]
+> For intel CPU: if a *kernel panic* occurs with the message **Corrupted page table at address**,
+> add `intel_iommu=off` to `GRUB_CMDLINE_LINUX`. (This has been observed on
+> an *11th Gen Intel(R) Core(TM) i7-11700B @ 3.20GHz*)
 
 ### Tutorials for your platform
 
