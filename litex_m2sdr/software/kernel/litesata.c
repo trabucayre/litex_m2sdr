@@ -253,6 +253,10 @@ check_err_and_exit:
 	return -EIO;
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
+typedef unsigned int blk_opf_t;
+#endif
+
 /* Process a single bvec of a bio. */
 static int litesata_do_bvec(struct litesata_dev *lbd, struct bio_vec *bv,
 			    blk_opf_t op, sector_t sector)
@@ -340,7 +344,11 @@ static int litesata_do_bvec(struct litesata_dev *lbd, struct bio_vec *bv,
 static void litesata_submit_bio(struct bio *bio)
 {
 	struct litesata_dev *lbd = bio->bi_bdev->bd_disk->private_data;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
+	blk_opf_t op = bio.bi_opf;
+#else
 	blk_opf_t op = bio_op(bio);
+#endif
 	sector_t sector = bio->bi_iter.bi_sector;
 	struct bio_vec bvec;
 	struct bvec_iter iter;
