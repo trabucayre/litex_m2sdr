@@ -341,11 +341,15 @@ static int litesata_do_bvec(struct litesata_dev *lbd, struct bio_vec *bv,
 	return 0;
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0)
+static blk_qc_t litesata_submit_bio(struct bio *bio)
+#else
 static void litesata_submit_bio(struct bio *bio)
+#endif
 {
 	struct litesata_dev *lbd = bio->bi_bdev->bd_disk->private_data;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
-	blk_opf_t op = bio.bi_opf;
+	blk_opf_t op = bio->bi_opf;
 #else
 	blk_opf_t op = bio_op(bio);
 #endif
@@ -367,12 +371,19 @@ static void litesata_submit_bio(struct bio *bio)
 				(long long)sector,
 				(long long)(sector + (bvec.bv_len >> SECTOR_SHIFT) - 1));
 			bio_io_error(bio);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0)
+			return BLK_QC_T_NONE;
+#else
 			return;
+#endif
 		}
 		sector += (bvec.bv_len >> SECTOR_SHIFT);
 	}
 
 	bio_endio(bio);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0)
+	return BLK_QC_T_NONE;
+#endif
 }
 
 static const struct block_device_operations litesata_fops = {
